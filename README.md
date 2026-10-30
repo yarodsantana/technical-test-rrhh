@@ -10,21 +10,29 @@ Módulo de Recursos Humanos implementado sobre el proyecto base: SQL Server, .NE
 
 ## Inicio rápido en Windows / Docker
 
-Desde la raíz del repositorio, con Docker Desktop abierto:
+Con el SDK .NET 10 instalado y Docker Desktop abierto, desde la raíz del repositorio:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\Initialize-Database.ps1
+Copy-Item .env.example .env
 ```
 
-El script genera una contraseña local en `.env` (ignorado por Git), inicia SQL Server Developer y espera su disponibilidad. En una base nueva ejecuta `database/01_schema_seed.sql` SIN modificarlo y luego `02_bonus.sql`. Si detecta la base o tabla existentes, no los borra ni vuelve a crearlos. Si una base preexistente está incompleta, revisarla antes de continuar.
+Editar la contraseña de ejemplo en el archivo local `.env` antes de iniciar SQL Server. El archivo está excluido de Git. Después ejecutar:
+
+```powershell
+docker compose up -d --wait
+dotnet run --project backend/tools/BonusTest.DatabaseSetup -- .
+```
+
+La herramienta auxiliar conecta por TCP a SQL Server. En una base nueva ejecuta `database/01_schema_seed.sql` SIN modificarlo y luego `02_bonus.sql`. Si la base o tabla ya existen, las conserva. Una base preexistente incompleta requiere revisión manual; no se borra automáticamente.
+
+En otra terminal, configurar la conexión con la misma contraseña local y arrancar la API:
+
+```powershell
+$env:ConnectionStrings__BonusTest = 'Server=tcp:127.0.0.1,1433;Database=BonusTest;User Id=sa;Password=TU_PASSWORD_LOCAL;TrustServerCertificate=True;'
+dotnet run --project backend/src/BonusTest.Api --launch-profile http
+```
 
 En otra terminal:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\Start-Api.ps1
-```
-
-En una tercera terminal:
 
 ```powershell
 cd frontend
@@ -35,11 +43,11 @@ npm start
 - Aplicación: http://localhost:4200/bonuses
 - Swagger: http://localhost:5106/swagger
 
-`Start-Api.ps1` usa el SDK local de `work/dotnet` si existe, o `dotnet` instalado en PATH. Ese SDK local no se incluye en Git. La cadena SQL se configura mediante `ConnectionStrings__BonusTest`; la contraseña no se incorpora al código. Al terminar, `docker compose stop` conserva los datos.
+La contraseña se configura por entorno y no se incorpora al código. Al terminar, `docker compose stop` conserva los datos.
 
 ### SQL Server existente
 
-Ejecutar `01_schema_seed.sql` una sola vez y `02_bonus.sql` después. Configurar la cadena antes de arrancar la API:
+Ejecutar `database/01_schema_seed.sql` una sola vez y `database/02_bonus.sql` después con el cliente SQL de preferencia. Configurar la conexión antes de arrancar la API:
 
 ```powershell
 $env:ConnectionStrings__BonusTest = 'Server=TU_SERVIDOR;Database=BonusTest;Trusted_Connection=True;TrustServerCertificate=True;'
@@ -48,22 +56,19 @@ dotnet run --project backend/src/BonusTest.Api --launch-profile http
 
 ## Verificación
 
-Detener la API antes de recompilar para evitar bloqueos de DLL en Windows. En esta máquina el SDK se instaló localmente: si dotnet no está en PATH, sustituirlo por & .\work\dotnet\dotnet.exe (desde la raíz del repositorio). En otra máquina, instalar el SDK .NET 10 como requisito.
+Detener la API antes de recompilar para evitar bloqueos de DLL en Windows. Desde la raíz del repositorio:
 
 ```powershell
 dotnet test backend/BonusTest.slnx --configuration Release
 cd frontend
+npm ci
 npm run build
-node --test src/app/features/bonuses/bonus-preview.test.mjs
+npm test
 ```
 
-Con API y SQL Server ejecutándose, desde la raíz:
+Verificaciones ejecutadas: compilación Release .NET y producción Angular correctas; 39 pruebas xUnit y 6 de vista previa aprobadas. También se realizaron 37 comprobaciones de API sobre SQL Server real y recorridos de navegador con registro, filtros, eliminación lógica y errores de negocio. Las pruebas unitarias de servicio usan un repositorio falso y un reloj fijo; se distinguen de las comprobaciones de integración.
 
-```powershell
-node scripts/api-smoke.mjs
-```
-
-La prueba de API utiliza periodos históricos, comprueba datos semilla, reglas, filtros, paginación, concurrencia y eliminación lógica. Hace limpieza lógica de sus bonos registrados. Por la regla de negocio, conserva el bono que anuló y los registros eliminados, con usuarios `smoke-test` / `smoke-test-cleanup` en auditoría. Ejecutarla en una base de prueba.
+La base local de desarrollo conserva registros históricos anulados y eliminados lógicamente de esas comprobaciones. No se incluyen datos de esas ejecuciones en el código entregado; la base nueva parte del seed original.
 
 ## Endpoints
 
@@ -114,10 +119,9 @@ Resultado del ejemplo: bruto 500.00, retención 40.00 y neto 460.00. Usar el mes
 - Extra implementado: pruebas unitarias de cálculo, estados y casos de uso con xUnit.
 - Extra pendiente: pago y distribución por proyecto. No hay botón ni endpoint de pago anunciado como funcional.
 - Fuera del alcance solicitado: autenticación real y despliegue productivo. Se conserva el header del proyecto base.
-- Consultar `docs/verification.md` para distinguir pruebas ejecutadas de verificaciones pendientes.
 
 ## Uso de IA y aprendizaje
 
-Se utilizó IA generativa mediante Codex para analizar el enunciado, proponer el diseño, generar código, preparar pruebas y revisar casos límite. Las decisiones y limitaciones están documentadas. No se considera que código generado sea correcto hasta revisarlo y verificarlo. Ver `docs/ai-usage.md` y `docs/learning-guide.md`.
+Se utilizó IA generativa mediante Codex para analizar el enunciado, proponer el diseño, generar código, preparar pruebas y revisar casos límite. Las decisiones y limitaciones están documentadas. No se considera que código generado sea correcto hasta revisarlo y verificarlo.
 
 Referencias de preparación del entorno: [SDK por script oficial](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script) y [SQL Server en Docker](https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver16).

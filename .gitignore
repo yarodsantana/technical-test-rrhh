@@ -11,3 +11,7 @@ work/
 
 **/TestResults/
 /*.pdf
+
+/docs/
+/scripts/
+/entrega-bonos.zip
