@@ -8,3 +8,6 @@ work/
 *.user
 *.suo
 .env
+
+**/TestResults/
+/*.pdf
