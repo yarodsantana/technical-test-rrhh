@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "npm run test:preview",
     "test:preview": "node --test src/app/features/bonuses/bonus-preview.test.mjs"
   },
   "private": true,
