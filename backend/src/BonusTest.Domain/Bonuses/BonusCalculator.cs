@@ -24,8 +24,6 @@ public static class BonusCalculator
             throw new BusinessException("BONUS_PRECISION", "El valor admite hasta cuatro decimales.");
 
         var gross = Round(bonusTypeId == BonusTypes.FixedAmount ? value : salary * value / 100m);
-        if (gross <= 0)
-            throw new BusinessException("BONUS_TOO_SMALL", "El bono debe generar un bruto de al menos 0.01.");
         var tax = Round(gross * taxRate / 100m);
         return new(gross, tax, Round(gross - tax));
     }

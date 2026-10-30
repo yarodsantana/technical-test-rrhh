@@ -33,7 +33,7 @@ CREATE TABLE dbo.Bonus (
     CONSTRAINT CK_Bonus_FinancialData CHECK (SalarySnapshot > 0 AND TaxRateSnapshot BETWEEN 0 AND 100),
     CONSTRAINT CK_Bonus_Value CHECK (Value > 0 AND
         ((BonusTypeId = 1 AND Value <= SalarySnapshot) OR (BonusTypeId = 2 AND Value <= 100))),
-    CONSTRAINT CK_Bonus_Amounts CHECK (GrossAmount > 0 AND TaxAmount >= 0
+    CONSTRAINT CK_Bonus_Amounts CHECK (GrossAmount >= 0 AND TaxAmount >= 0
         AND NetAmount >= 0 AND NetAmount = GrossAmount - TaxAmount),
     CONSTRAINT CK_Bonus_Audit CHECK (LEN(LTRIM(RTRIM(CreatedBy))) > 0
         AND LEN(LTRIM(RTRIM(ModifiedBy))) > 0 AND ModifiedAt >= CreatedAt)
