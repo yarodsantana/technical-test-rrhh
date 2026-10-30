@@ -9,10 +9,10 @@ import { BonusApi } from '../../core/services/bonus-api';
 import { currentLimaMonth, previewBonus } from './bonus-preview';
 
 @Component({
+  host: { class: 'modal modal-shell' },
   selector: 'app-bonus-form',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './bonus-form.html',
-  styleUrl: './bonus-form.css',
 })
 export class BonusForm implements AfterViewInit {
   readonly departments = input.required<Department[]>();

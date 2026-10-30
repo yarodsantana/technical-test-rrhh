@@ -111,7 +111,7 @@ Resultado del ejemplo: bruto 500.00, retención 40.00 y neto 460.00. Usar el mes
 - **Listado:** consulta sin tracking, filtros en SQL, CountAsync y Skip/Take antes de materializar. Orden estable por periodo e identificador descendentes; las descripciones viajan listas para mostrar. El segundo índice favorece el orden por periodo y el filtrado de estado sin filas eliminadas.
 - **Angular:** formularios reactivos y señales, modal nativo, estados de carga y confirmación. La búsqueda de empleado se invalida al cambiar su clave. La vista previa usa aritmética entera con BigInt para evitar errores binarios en mitades; la API recalcula y es la autoridad.
 - **Errores:** se conserva BusinessException y el interceptor 409 del proyecto base. Los componentes no duplican mensajes de error.
-- **Dependencias:** no se agregó librería de UI ni arquitectura adicional.
+- **Dependencias:** Bootstrap 5.3.8 se instala por npm con versión fija. Se utilizan su grilla, formularios, tablas, botones, avisos y utilidades; el CSS propio se limita a adaptar los diálogos nativos y la posición de las notificaciones. Angular conserva el control de formularios y estados, sin plugins JavaScript de Bootstrap.
 
 ## Alcance y pendientes
 

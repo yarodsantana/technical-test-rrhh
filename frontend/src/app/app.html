@@ -1,15 +1,14 @@
-<header class="topbar">
-  <span class="brand">Recursos Humanos · Back office</span>
+<header class="navbar bg-dark px-3 px-lg-4 py-3" data-bs-theme="dark">
+  <span class="navbar-brand mb-0 fs-6">Recursos Humanos · Back office</span>
 </header>
 
 @if (notification.message(); as message) {
-  <div #notificationBanner popover="manual" [class]="'notification notification-' + message.type" role="alert">
+  <div #notificationBanner popover="manual" class="notification alert shadow d-flex justify-content-between align-items-center gap-3 mb-0" [class.alert-danger]="message.type === 'error'" [class.alert-warning]="message.type === 'warning'" [class.alert-success]="message.type === 'success'" role="alert">
     <span>{{ message.text }}</span>
-    <button type="button" class="notification-close" aria-label="Cerrar" (click)="notification.clear()">×</button>
+    <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar" (click)="notification.clear()"></button>
   </div>
 }
 
-<main class="content">
+<main class="container-fluid px-3 px-lg-4 py-4">
   <router-outlet />
 </main>
-

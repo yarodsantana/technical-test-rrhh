@@ -18,7 +18,6 @@ const emptyFilter = (): BonusFilter => ({ departmentCode: '', employeeNumber: nu
   selector: 'app-bonuses',
   imports: [CommonModule, ReactiveFormsModule, BonusForm, BonusConfirmation],
   templateUrl: './bonuses.html',
-  styleUrl: './bonuses.css',
 })
 export class Bonuses implements OnInit {
   private readonly api = inject(BonusApi);

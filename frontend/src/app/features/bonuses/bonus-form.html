@@ -1,46 +1,54 @@
-<dialog #dialog aria-labelledby="bonus-form-title" (cancel)="close($event)">
-  <header class="modal-header"><div><p class="eyebrow">NUEVO RECONOCIMIENTO</p><h2 id="bonus-form-title">Registrar bono</h2></div>
-    <button type="button" class="close-button" aria-label="Cerrar registro" [disabled]="saving()" (click)="close()">×</button></header>
+<dialog #dialog class="bonus-dialog modal-content shadow" aria-labelledby="bonus-form-title" (cancel)="close($event)">
+  <header class="modal-header"><div><p class="text-primary small fw-semibold mb-1">NUEVO RECONOCIMIENTO</p><h2 id="bonus-form-title" class="modal-title fs-4">Registrar bono</h2></div>
+    <button type="button" class="btn-close" aria-label="Cerrar registro" [disabled]="saving()" (click)="close()"></button></header>
   <div class="modal-body">
-    <form [formGroup]="lookup" (ngSubmit)="findEmployee()" class="lookup">
-      <h3>1. Busca al empleado</h3>
-      <div class="lookup-fields"><label>Área<select aria-label="Área" formControlName="departmentCode" [attr.aria-invalid]="lookup.controls.departmentCode.touched && lookup.controls.departmentCode.invalid">
-        <option value="">Selecciona un área</option>
-        @for (department of departments(); track department.departmentCode) { <option [value]="department.departmentCode">{{ department.departmentName }}</option> }
-      </select></label><label>N.º de empleado<input type="number" formControlName="employeeNumber" min="1" step="1" placeholder="Ej. 101" /></label>
-        <button type="submit" class="btn btn-secondary" [disabled]="looking() || saving()">{{ looking() ? 'Buscando…' : 'Buscar empleado' }}</button></div>
-      @if (lookup.invalid && lookup.touched) { <small class="error">Selecciona un área e ingresa un número de empleado entero y positivo.</small> }
+    <form [formGroup]="lookup" (ngSubmit)="findEmployee()">
+      <h3 class="h6 mb-3">1. Busca al empleado</h3>
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-sm-4"><label for="employee-department" class="form-label small fw-semibold">Área</label>
+          <select id="employee-department" class="form-select" formControlName="departmentCode" [attr.aria-invalid]="lookup.controls.departmentCode.touched && lookup.controls.departmentCode.invalid">
+            <option value="">Selecciona un área</option>
+            @for (department of departments(); track department.departmentCode) { <option [value]="department.departmentCode">{{ department.departmentName }}</option> }
+          </select></div>
+        <div class="col-12 col-sm-4"><label for="employee-number" class="form-label small fw-semibold">N.º de empleado</label>
+          <input id="employee-number" class="form-control" type="number" formControlName="employeeNumber" min="1" step="1" placeholder="Ej. 101" /></div>
+        <div class="col-12 col-sm-4"><button type="submit" class="btn btn-outline-primary w-100" [disabled]="looking() || saving()">{{ looking() ? 'Buscando…' : 'Buscar empleado' }}</button></div>
+      </div>
+      @if (lookup.invalid && lookup.touched) { <p class="text-danger small mt-2 mb-0">Selecciona un área e ingresa un número de empleado entero y positivo.</p> }
     </form>
     @if (employee(); as employee) {
-      <section class="employee-card" aria-live="polite"><strong>{{ employee.fullName }}</strong><span>{{ employee.departmentCode }}-{{ employee.employeeNumber }} · Activo</span>
-        <dl><div><dt>Fecha de ingreso</dt><dd>{{ employee.hireDate | date:'dd/MM/yyyy' }}</dd></div>
-          <div><dt>Sueldo mensual</dt><dd>{{ employee.monthlySalary | number:'1.2-2' }}</dd></div>
-          <div><dt>Retención</dt><dd>{{ employee.taxRate | number:'1.0-2' }} %</dd></div></dl>
+      <section class="alert alert-light border my-4" aria-live="polite"><strong class="d-block">{{ employee.fullName }}</strong>
+        <span class="small text-body-secondary">{{ employee.departmentCode }}-{{ employee.employeeNumber }} · Activo</span>
+        <dl class="row g-3 mb-0 mt-1"><div class="col-6 col-sm-4"><dt class="small text-body-secondary fw-normal">Fecha de ingreso</dt><dd class="fw-semibold mb-0">{{ employee.hireDate | date:'dd/MM/yyyy' }}</dd></div>
+          <div class="col-6 col-sm-4"><dt class="small text-body-secondary fw-normal">Sueldo mensual</dt><dd class="fw-semibold mb-0">{{ employee.monthlySalary | number:'1.2-2' }}</dd></div>
+          <div class="col-6 col-sm-4"><dt class="small text-body-secondary fw-normal">Retención</dt><dd class="fw-semibold mb-0">{{ employee.taxRate | number:'1.0-2' }} %</dd></div></dl>
       </section>
       <form id="register-bonus" [formGroup]="form" (ngSubmit)="save()">
-        <h3>2. Define el bono</h3><div class="form-grid">
-          <label>Periodo<input type="month" formControlName="period" [max]="maxMonth" />
-            @if ((form.controls.period.invalid || futurePeriod()) && form.controls.period.touched) { <small class="error">Elige un periodo válido hasta {{ maxMonth }}.</small> }</label>
-          <label>Tipo de bono<select aria-label="Tipo de bono" formControlName="bonusTypeId">
+        <h3 class="h6 mb-3">2. Define el bono</h3><div class="row g-3">
+          <div class="col-12 col-sm-6"><label for="bonus-period" class="form-label small fw-semibold">Periodo</label>
+            <input id="bonus-period" class="form-control" [class.is-invalid]="(form.controls.period.invalid || futurePeriod()) && form.controls.period.touched" type="month" formControlName="period" [max]="maxMonth" />
+            @if ((form.controls.period.invalid || futurePeriod()) && form.controls.period.touched) { <div class="invalid-feedback">Elige un periodo válido hasta {{ maxMonth }}.</div> }</div>
+          <div class="col-12 col-sm-6"><label for="bonus-type" class="form-label small fw-semibold">Tipo de bono</label><select id="bonus-type" class="form-select" formControlName="bonusTypeId">
             @for (type of types(); track type.bonusTypeId) { <option [ngValue]="type.bonusTypeId">{{ type.bonusTypeDescription }}</option> }
-          </select></label>
-          <label>{{ percentage() ? 'Porcentaje del sueldo (%)' : 'Monto fijo' }}
-            <input type="text" inputmode="decimal" formControlName="value" placeholder="Ej. 10.00" autocomplete="off" />
-            <small>{{ percentage() ? 'Mayor que 0 y hasta 100 %.' : 'Mayor que 0 y hasta el sueldo mensual.' }} Hasta 4 decimales; usa punto decimal.</small>
-            @if (form.controls.value.touched && (!preview() || form.controls.value.invalid)) { <small class="error">Revisa el rango y el formato del valor.</small> }
-          </label>
-          <label>Motivo<select aria-label="Motivo" formControlName="reasonCode"><option value="">Selecciona un motivo</option>
-            @for (reason of reasons(); track reason.reasonCode) { <option [value]="reason.reasonCode">{{ reason.reasonDescription }}</option> }
-          </select>@if (form.controls.reasonCode.touched && form.controls.reasonCode.invalid) { <small class="error">Selecciona un motivo activo.</small> }</label>
+          </select></div>
+          <div class="col-12 col-sm-6"><label for="bonus-value" class="form-label small fw-semibold">{{ percentage() ? 'Porcentaje del sueldo (%)' : 'Monto fijo' }}</label>
+            <input id="bonus-value" class="form-control" [class.is-invalid]="form.controls.value.touched && (!preview() || form.controls.value.invalid)" type="text" inputmode="decimal" formControlName="value" placeholder="Ej. 10.00" autocomplete="off" aria-describedby="bonus-value-help" />
+            <div id="bonus-value-help" class="form-text">{{ percentage() ? 'Mayor que 0 y hasta 100 %.' : 'Mayor que 0 y hasta el sueldo mensual.' }} Hasta 4 decimales; usa punto decimal.</div>
+            @if (form.controls.value.touched && (!preview() || form.controls.value.invalid)) { <div class="invalid-feedback">Revisa el rango y el formato del valor.</div> }
+          </div>
+          <div class="col-12 col-sm-6"><label for="bonus-reason" class="form-label small fw-semibold">Motivo</label>
+            <select id="bonus-reason" class="form-select" [class.is-invalid]="form.controls.reasonCode.touched && form.controls.reasonCode.invalid" formControlName="reasonCode"><option value="">Selecciona un motivo</option>
+              @for (reason of reasons(); track reason.reasonCode) { <option [value]="reason.reasonCode">{{ reason.reasonDescription }}</option> }
+            </select>@if (form.controls.reasonCode.touched && form.controls.reasonCode.invalid) { <div class="invalid-feedback">Selecciona un motivo activo.</div> }</div>
         </div>
-        <section class="preview" aria-live="polite" aria-label="Vista previa del cálculo">
-          <div><span>Bruto</span><strong>{{ preview() ? (preview()!.gross | number:'1.2-2') : '—' }}</strong></div>
-          <div><span>Retención</span><strong>{{ preview() ? (preview()!.tax | number:'1.2-2') : '—' }}</strong></div>
-          <div class="net-preview"><span>Neto a pagar</span><strong>{{ preview() ? (preview()!.net | number:'1.2-2') : '—' }}</strong></div>
-        </section><p class="hint">Vista previa. Los importes definitivos se calculan al guardar.</p>
+        <section class="row g-0 border rounded overflow-hidden mt-4" aria-live="polite" aria-label="Vista previa del cálculo">
+          <div class="col-4 p-3"><span class="d-block small text-body-secondary mb-1">Bruto</span><strong class="fs-5">{{ preview() ? (preview()!.gross | number:'1.2-2') : '—' }}</strong></div>
+          <div class="col-4 p-3"><span class="d-block small text-body-secondary mb-1">Retención</span><strong class="fs-5">{{ preview() ? (preview()!.tax | number:'1.2-2') : '—' }}</strong></div>
+          <div class="col-4 p-3 bg-primary-subtle text-primary-emphasis" data-testid="net-preview"><span class="d-block small mb-1">Neto a pagar</span><strong class="fs-5">{{ preview() ? (preview()!.net | number:'1.2-2') : '—' }}</strong></div>
+        </section><p class="form-text mb-0">Vista previa. Los importes definitivos se calculan al guardar.</p>
       </form>
-    } @else { <p class="hint search-hint">Busca un empleado activo para completar el registro.</p> }
+    } @else { <p class="text-body-secondary small mt-4 mb-0">Busca un empleado activo para completar el registro.</p> }
   </div>
-  <footer class="modal-footer"><button type="button" class="btn btn-secondary" [disabled]="saving()" (click)="close()">Cancelar</button>
+  <footer class="modal-footer"><button type="button" class="btn btn-outline-secondary" [disabled]="saving()" (click)="close()">Cancelar</button>
     <button type="submit" form="register-bonus" class="btn btn-primary" [disabled]="saving() || !employee() || form.invalid || !preview() || futurePeriod()">{{ saving() ? 'Guardando…' : 'Registrar bono' }}</button></footer>
 </dialog>

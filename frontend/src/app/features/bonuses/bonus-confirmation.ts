@@ -2,22 +2,16 @@ import { AfterViewInit, Component, ElementRef, ViewChild, input, output } from '
 import { Bonus } from '../../core/models/bonus';
 
 @Component({
+  host: { class: 'modal modal-shell' },
   selector: 'app-bonus-confirmation',
   template: `
-    <dialog #dialog aria-labelledby="confirm-title" (cancel)="close($event)">
-      <h2 id="confirm-title">{{ pending().action === 'cancel' ? 'Anular' : 'Eliminar' }} bono</h2>
-      <p>{{ pending().bonus.fullName }} · {{ pending().bonus.period }}</p>
-      <p>{{ pending().action === 'cancel' ? 'El bono quedará en estado Anulado.' : 'El bono dejará de aparecer en el listado; se conservará su historial.' }}</p>
-      <footer><button type="button" class="btn btn-secondary" [disabled]="busy()" (click)="close()" autofocus>Volver</button>
+    <dialog #dialog class="bonus-dialog bonus-dialog-sm modal-content shadow" aria-labelledby="confirm-title" (cancel)="close($event)">
+      <header class="modal-header"><h2 id="confirm-title" class="modal-title fs-5">{{ pending().action === 'cancel' ? 'Anular' : 'Eliminar' }} bono</h2></header>
+      <div class="modal-body"><p class="fw-semibold">{{ pending().bonus.fullName }} · {{ pending().bonus.period }}</p>
+        <p class="text-body-secondary mb-0">{{ pending().action === 'cancel' ? 'El bono quedará en estado Anulado.' : 'El bono dejará de aparecer en el listado; se conservará su historial.' }}</p></div>
+      <footer class="modal-footer"><button type="button" class="btn btn-outline-secondary" [disabled]="busy()" (click)="close()" autofocus>Volver</button>
         <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="confirmed.emit()">{{ busy() ? 'Procesando…' : 'Confirmar' }}</button></footer>
     </dialog>
-  `,
-  styles: `
-    dialog { border:0; width:min(440px,calc(100vw - 32px)); border-radius:12px; padding:28px; color:var(--text); box-shadow:0 20px 60px #10243b33; }
-    dialog::backdrop { background:#14283c80; }
-    h2 { font-size:1.3rem; margin:0; }
-    p { line-height:1.6; font-size:.9rem; }
-    footer { display:flex; justify-content:flex-end; gap:12px; margin-top:24px; }
   `,
 })
 export class BonusConfirmation implements AfterViewInit {
