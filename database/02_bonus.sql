@@ -24,27 +24,24 @@ CREATE TABLE dbo.Bonus (
     ModifiedAt DATETIME2(7) NOT NULL,
     RowVersion ROWVERSION NOT NULL,
     CONSTRAINT FK_Bonus_Employee FOREIGN KEY (DepartmentCode, EmployeeNumber)
-        REFERENCES dbo.Employee(DepartmentCode, EmployeeNumber),
+    REFERENCES dbo.Employee(DepartmentCode, EmployeeNumber),
     CONSTRAINT FK_Bonus_Type FOREIGN KEY (BonusTypeId) REFERENCES dbo.BonusType(BonusTypeId),
     CONSTRAINT FK_Bonus_Reason FOREIGN KEY (ReasonCode) REFERENCES dbo.BonusReason(ReasonCode),
     CONSTRAINT FK_Bonus_State FOREIGN KEY (StateCode) REFERENCES dbo.State(StateCode),
     CONSTRAINT CK_Bonus_State CHECK (StateCode IN ('0201','0202','0203')),
     CONSTRAINT CK_Bonus_Period CHECK (DAY(Period) = 1),
     CONSTRAINT CK_Bonus_FinancialData CHECK (SalarySnapshot > 0 AND TaxRateSnapshot BETWEEN 0 AND 100),
-    CONSTRAINT CK_Bonus_Value CHECK (Value > 0 AND
-        ((BonusTypeId = 1 AND Value <= SalarySnapshot) OR (BonusTypeId = 2 AND Value <= 100))),
-    CONSTRAINT CK_Bonus_Amounts CHECK (GrossAmount >= 0 AND TaxAmount >= 0
-        AND NetAmount >= 0 AND NetAmount = GrossAmount - TaxAmount),
-    CONSTRAINT CK_Bonus_Audit CHECK (LEN(LTRIM(RTRIM(CreatedBy))) > 0
-        AND LEN(LTRIM(RTRIM(ModifiedBy))) > 0 AND ModifiedAt >= CreatedAt)
+    CONSTRAINT CK_Bonus_Value CHECK (Value > 0 AND ((BonusTypeId = 1 AND Value <= SalarySnapshot) OR (BonusTypeId = 2 AND Value <= 100))),
+    CONSTRAINT CK_Bonus_Amounts CHECK (GrossAmount >= 0 AND TaxAmount >= 0 AND NetAmount >= 0 AND NetAmount = GrossAmount - TaxAmount),
+    CONSTRAINT CK_Bonus_Audit CHECK (LEN(LTRIM(RTRIM(CreatedBy))) > 0 AND LEN(LTRIM(RTRIM(ModifiedBy))) > 0 AND ModifiedAt >= CreatedAt)
 );
 
--- Enforce uniqueness even when concurrent requests both pass application validation.
+-- Garantiza la unicidad incluso cuando solicitudes concurrentes superan, ambas, la validación de la aplicación.
 CREATE UNIQUE INDEX UX_Bonus_ActiveEmployeePeriod
     ON dbo.Bonus(DepartmentCode, EmployeeNumber, Period)
     WHERE IsDeleted = 0 AND StateCode <> '0203';
 
--- Support default ordered paging and the common period/state filters without deleted rows.
+-- Admite paginación ordenada predeterminada y los filtros habituales por período o estado, excluyendo las filas eliminadas.
 CREATE INDEX IX_Bonus_Period_State
     ON dbo.Bonus(Period DESC, StateCode, BonusId DESC)
     INCLUDE (DepartmentCode, EmployeeNumber)

@@ -66,7 +66,9 @@ npm run build
 npm test
 ```
 
-Verificaciones ejecutadas: compilación Release .NET y producción Angular correctas; 39 pruebas xUnit y 6 de vista previa aprobadas. También se realizaron 37 comprobaciones de API sobre SQL Server real y recorridos de navegador con registro, filtros, eliminación lógica y errores de negocio. Las pruebas unitarias de servicio usan un repositorio falso y un reloj fijo; se distinguen de las comprobaciones de integración.
+Verificaciones ejecutadas: compilación Release .NET y producción Angular correctas; 39 pruebas xUnit y 6 de vista previa aprobadas. También se realizaron 37 comprobaciones de API y 13 comprobaciones adicionales de integridad y concurrencia sobre SQL Server real, además de recorridos de navegador con registro, filtros, eliminación lógica y errores de negocio. Las pruebas unitarias de servicio usan un repositorio falso y un reloj fijo; se distinguen de las comprobaciones de integración.
+
+La compilación Angular con Bootstrap genera una advertencia de tamaño: el paquete inicial ocupa aproximadamente 501.7 kB frente al umbral de advertencia de 500 kB. No impide compilar y está por debajo del límite de error de 1 MB. La restauración, compilación y pruebas se comprobaron también sobre una copia extraída del paquete de entrega.
 
 La base local de desarrollo conserva registros históricos anulados y eliminados lógicamente de esas comprobaciones. No se incluyen datos de esas ejecuciones en el código entregado; la base nueva parte del seed original.
 
