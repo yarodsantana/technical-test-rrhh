@@ -11,7 +11,6 @@ export function previewBonus(type: number, value: string, salary: number, taxRat
   const taxHundredths = scaled(taxRate.toFixed(2), 2);
   if (amount <= 0n || (type === 1 && amount > salaryCents * 100n) || (type === 2 && amount > 1000000n)) return null;
   const gross = type === 1 ? roundedDivide(amount, 100n) : roundedDivide(salaryCents * amount, 1000000n);
-  if (gross <= 0n) return null;
   const tax = roundedDivide(gross * taxHundredths, 10000n);
   return { gross: Number(gross) / 100, tax: Number(tax) / 100, net: Number(gross - tax) / 100 };
 }

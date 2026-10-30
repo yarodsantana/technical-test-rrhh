@@ -10,12 +10,13 @@ import { BonusApi } from '../../core/services/bonus-api';
 import { CatalogApi } from '../../core/services/catalog-api';
 import { Notification } from '../../core/services/notification';
 import { BonusForm } from './bonus-form';
+import { BonusConfirmation } from './bonus-confirmation';
 
 const emptyFilter = (): BonusFilter => ({ departmentCode: '', employeeNumber: null, period: '', stateCode: '' });
 
 @Component({
   selector: 'app-bonuses',
-  imports: [CommonModule, ReactiveFormsModule, BonusForm],
+  imports: [CommonModule, ReactiveFormsModule, BonusForm, BonusConfirmation],
   templateUrl: './bonuses.html',
   styleUrl: './bonuses.css',
 })
@@ -101,3 +102,4 @@ export class Bonuses implements OnInit {
     });
   }
 }
+

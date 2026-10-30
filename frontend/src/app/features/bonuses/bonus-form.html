@@ -4,7 +4,7 @@
   <div class="modal-body">
     <form [formGroup]="lookup" (ngSubmit)="findEmployee()" class="lookup">
       <h3>1. Busca al empleado</h3>
-      <div class="lookup-fields"><label>Área<select formControlName="departmentCode" [attr.aria-invalid]="lookup.controls.departmentCode.touched && lookup.controls.departmentCode.invalid">
+      <div class="lookup-fields"><label>Área<select aria-label="Área" formControlName="departmentCode" [attr.aria-invalid]="lookup.controls.departmentCode.touched && lookup.controls.departmentCode.invalid">
         <option value="">Selecciona un área</option>
         @for (department of departments(); track department.departmentCode) { <option [value]="department.departmentCode">{{ department.departmentName }}</option> }
       </select></label><label>N.º de empleado<input type="number" formControlName="employeeNumber" min="1" step="1" placeholder="Ej. 101" /></label>
@@ -21,15 +21,15 @@
         <h3>2. Define el bono</h3><div class="form-grid">
           <label>Periodo<input type="month" formControlName="period" [max]="maxMonth" />
             @if ((form.controls.period.invalid || futurePeriod()) && form.controls.period.touched) { <small class="error">Elige un periodo válido hasta {{ maxMonth }}.</small> }</label>
-          <label>Tipo de bono<select formControlName="bonusTypeId">
+          <label>Tipo de bono<select aria-label="Tipo de bono" formControlName="bonusTypeId">
             @for (type of types(); track type.bonusTypeId) { <option [ngValue]="type.bonusTypeId">{{ type.bonusTypeDescription }}</option> }
           </select></label>
           <label>{{ percentage() ? 'Porcentaje del sueldo (%)' : 'Monto fijo' }}
             <input type="text" inputmode="decimal" formControlName="value" placeholder="Ej. 10.00" autocomplete="off" />
             <small>{{ percentage() ? 'Mayor que 0 y hasta 100 %.' : 'Mayor que 0 y hasta el sueldo mensual.' }} Hasta 4 decimales; usa punto decimal.</small>
-            @if (form.controls.value.touched && (!preview() || form.controls.value.invalid)) { <small class="error">Revisa el rango y el formato del valor. Debe generar al menos 0.01 de bruto.</small> }
+            @if (form.controls.value.touched && (!preview() || form.controls.value.invalid)) { <small class="error">Revisa el rango y el formato del valor.</small> }
           </label>
-          <label>Motivo<select formControlName="reasonCode"><option value="">Selecciona un motivo</option>
+          <label>Motivo<select aria-label="Motivo" formControlName="reasonCode"><option value="">Selecciona un motivo</option>
             @for (reason of reasons(); track reason.reasonCode) { <option [value]="reason.reasonCode">{{ reason.reasonDescription }}</option> }
           </select>@if (form.controls.reasonCode.touched && form.controls.reasonCode.invalid) { <small class="error">Selecciona un motivo activo.</small> }</label>
         </div>

@@ -31,9 +31,5 @@ tr:hover td { background:#fafbfd; }
 .pagination>div { display:flex; align-items:center; gap:14px; }
 .notice { padding:12px; background:#f5f7fb; border-radius:6px; font-size:.85rem; }
 .error { color:#a52e2e; }
-.confirm-backdrop { position:fixed; inset:0; background:#14283c80; display:grid; place-items:center; z-index:20; padding:20px; }
-.confirm-box { max-width:440px; background:white; padding:28px; border-radius:12px; box-shadow:0 20px 60px #10243b33; }
-.confirm-box h2 { font-size:1.3rem; }
-.confirm-box p { line-height:1.6; font-size:.9rem; }
-.confirm-actions { display:flex; justify-content:flex-end; gap:12px; margin-top:24px; }
 @media(max-width:700px) { .card-header,.pagination { align-items:flex-start; flex-direction:column; } .filters { padding:14px; } .pagination>div { flex-wrap:wrap; } }
+

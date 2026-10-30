@@ -61,13 +61,5 @@
   <app-bonus-form [departments]="departments()" [types]="bonusTypes()" [reasons]="reasons()" (saved)="saved()" (closed)="showForm.set(false)" />
 }
 @if (confirmation(); as pending) {
-  <div class="confirm-backdrop">
-    <section class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" (keydown.escape)="!acting() && confirmation.set(null)">
-      <h2 id="confirm-title">{{ pending.action === 'cancel' ? 'Anular' : 'Eliminar' }} bono</h2>
-      <p>{{ pending.bonus.fullName }} · {{ pending.bonus.period }}</p>
-      <p>{{ pending.action === 'cancel' ? 'El bono quedará en estado Anulado.' : 'El bono dejará de aparecer en el listado; se conservará su historial.' }}</p>
-      <div class="confirm-actions"><button type="button" class="btn btn-secondary" [disabled]="acting()" (click)="confirmation.set(null)">Volver</button>
-        <button type="button" class="btn btn-danger" [disabled]="acting()" (click)="confirm()">{{ acting() ? 'Procesando…' : 'Confirmar' }}</button></div>
-    </section>
-  </div>
+  <app-bonus-confirmation [pending]="pending" [busy]="acting()" (closed)="confirmation.set(null)" (confirmed)="confirm()" />
 }
