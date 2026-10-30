@@ -1,0 +1,46 @@
+<dialog #dialog aria-labelledby="bonus-form-title" (cancel)="close($event)">
+  <header class="modal-header"><div><p class="eyebrow">NUEVO RECONOCIMIENTO</p><h2 id="bonus-form-title">Registrar bono</h2></div>
+    <button type="button" class="close-button" aria-label="Cerrar registro" [disabled]="saving()" (click)="close()">×</button></header>
+  <div class="modal-body">
+    <form [formGroup]="lookup" (ngSubmit)="findEmployee()" class="lookup">
+      <h3>1. Busca al empleado</h3>
+      <div class="lookup-fields"><label>Área<select formControlName="departmentCode" [attr.aria-invalid]="lookup.controls.departmentCode.touched && lookup.controls.departmentCode.invalid">
+        <option value="">Selecciona un área</option>
+        @for (department of departments(); track department.departmentCode) { <option [value]="department.departmentCode">{{ department.departmentName }}</option> }
+      </select></label><label>N.º de empleado<input type="number" formControlName="employeeNumber" min="1" step="1" placeholder="Ej. 101" /></label>
+        <button type="submit" class="btn btn-secondary" [disabled]="looking() || saving()">{{ looking() ? 'Buscando…' : 'Buscar empleado' }}</button></div>
+      @if (lookup.invalid && lookup.touched) { <small class="error">Selecciona un área e ingresa un número de empleado entero y positivo.</small> }
+    </form>
+    @if (employee(); as employee) {
+      <section class="employee-card" aria-live="polite"><strong>{{ employee.fullName }}</strong><span>{{ employee.departmentCode }}-{{ employee.employeeNumber }} · Activo</span>
+        <dl><div><dt>Fecha de ingreso</dt><dd>{{ employee.hireDate | date:'dd/MM/yyyy' }}</dd></div>
+          <div><dt>Sueldo mensual</dt><dd>{{ employee.monthlySalary | number:'1.2-2' }}</dd></div>
+          <div><dt>Retención</dt><dd>{{ employee.taxRate | number:'1.0-2' }} %</dd></div></dl>
+      </section>
+      <form id="register-bonus" [formGroup]="form" (ngSubmit)="save()">
+        <h3>2. Define el bono</h3><div class="form-grid">
+          <label>Periodo<input type="month" formControlName="period" [max]="maxMonth" />
+            @if ((form.controls.period.invalid || futurePeriod()) && form.controls.period.touched) { <small class="error">Elige un periodo válido hasta {{ maxMonth }}.</small> }</label>
+          <label>Tipo de bono<select formControlName="bonusTypeId">
+            @for (type of types(); track type.bonusTypeId) { <option [ngValue]="type.bonusTypeId">{{ type.bonusTypeDescription }}</option> }
+          </select></label>
+          <label>{{ percentage() ? 'Porcentaje del sueldo (%)' : 'Monto fijo' }}
+            <input type="text" inputmode="decimal" formControlName="value" placeholder="Ej. 10.00" autocomplete="off" />
+            <small>{{ percentage() ? 'Mayor que 0 y hasta 100 %.' : 'Mayor que 0 y hasta el sueldo mensual.' }} Hasta 4 decimales; usa punto decimal.</small>
+            @if (form.controls.value.touched && (!preview() || form.controls.value.invalid)) { <small class="error">Revisa el rango y el formato del valor. Debe generar al menos 0.01 de bruto.</small> }
+          </label>
+          <label>Motivo<select formControlName="reasonCode"><option value="">Selecciona un motivo</option>
+            @for (reason of reasons(); track reason.reasonCode) { <option [value]="reason.reasonCode">{{ reason.reasonDescription }}</option> }
+          </select>@if (form.controls.reasonCode.touched && form.controls.reasonCode.invalid) { <small class="error">Selecciona un motivo activo.</small> }</label>
+        </div>
+        <section class="preview" aria-live="polite" aria-label="Vista previa del cálculo">
+          <div><span>Bruto</span><strong>{{ preview() ? (preview()!.gross | number:'1.2-2') : '—' }}</strong></div>
+          <div><span>Retención</span><strong>{{ preview() ? (preview()!.tax | number:'1.2-2') : '—' }}</strong></div>
+          <div class="net-preview"><span>Neto a pagar</span><strong>{{ preview() ? (preview()!.net | number:'1.2-2') : '—' }}</strong></div>
+        </section><p class="hint">Vista previa. Los importes definitivos se calculan al guardar.</p>
+      </form>
+    } @else { <p class="hint search-hint">Busca un empleado activo para completar el registro.</p> }
+  </div>
+  <footer class="modal-footer"><button type="button" class="btn btn-secondary" [disabled]="saving()" (click)="close()">Cancelar</button>
+    <button type="submit" form="register-bonus" class="btn btn-primary" [disabled]="saving() || !employee() || form.invalid || !preview() || futurePeriod()">{{ saving() ? 'Guardando…' : 'Registrar bono' }}</button></footer>
+</dialog>

@@ -1,33 +1,73 @@
 <section class="card">
   <header class="card-header">
-    <h2>Bonos de desempeño</h2>
-    <button type="button" class="btn btn-primary" disabled>Nuevo registro</button>
+    <div><p class="eyebrow">GESTIÓN DE COMPENSACIONES</p><h1>Bonos de desempeño</h1>
+      <p class="subtitle">Registra y consulta los reconocimientos de tu equipo.</p></div>
+    <button type="button" class="btn btn-primary" [disabled]="!catalogsReady() || acting()" (click)="showForm.set(true)">+ Nuevo bono</button>
   </header>
 
-  <div class="filters">
-    <label>
-      Área
-      <select>
-        <option value="">Todas</option>
-        @for (department of departments(); track department.departmentCode) {
-          <option [value]="department.departmentCode">{{ department.departmentName }}</option>
-        }
-      </select>
+  @if (!catalogsReady()) {
+    <p class="notice">Cargando catálogos… Si el servicio no está disponible, <button class="link" (click)="loadCatalogs()">reintentar</button>.</p>
+  }
+  <form class="filters" [formGroup]="filters" (ngSubmit)="search()">
+    <label>Área<select formControlName="departmentCode"><option value="">Todas las áreas</option>
+      @for (department of departments(); track department.departmentCode) {
+        <option [value]="department.departmentCode">{{ department.departmentName }}</option>
+      }</select></label>
+    <label>N.º de empleado<input type="number" formControlName="employeeNumber" placeholder="Ej. 101" min="1" step="1" />
+      @if (filters.controls.employeeNumber.invalid && filters.controls.employeeNumber.touched) { <small class="error">Ingresa un entero positivo.</small> }
     </label>
+    <label>Periodo<input type="month" formControlName="period" /></label>
+    <label>Estado<select formControlName="stateCode"><option value="">Todos los estados</option>
+      @for (state of bonusStates(); track state.stateCode) { <option [value]="state.stateCode">{{ state.stateDescription }}</option> }
+    </select></label>
+    <div class="filter-actions"><button class="btn btn-primary" type="submit" [disabled]="loading()">Buscar</button>
+      <button class="btn btn-secondary" type="button" (click)="clear()" [disabled]="loading()">Limpiar</button></div>
+  </form>
 
-    <label>
-      Estado
-      <select>
-        <option value="">Todos</option>
-        @for (state of bonusStates(); track state.stateCode) {
-          <option [value]="state.stateCode">{{ state.stateDescription }}</option>
+  <div class="results-heading"><h2>Historial de bonos</h2><span>{{ page().totalRecords }} registros</span></div>
+  @if (loading()) { <p role="status" class="notice">Consultando bonos…</p> }
+  @if (failed()) { <p role="alert" class="notice error">No se pudo actualizar el listado. <button class="link" (click)="goTo(page().pageNumber)">Reintentar</button></p> }
+  <div class="table-scroll" [attr.aria-busy]="loading()">
+    <table>
+      <caption class="sr-only">Bonos de desempeño, importes expresados en la moneda del sueldo.</caption>
+      <thead><tr><th>Acciones</th><th>Estado</th><th>Periodo</th><th>Área / N.º</th><th>Empleado</th><th>Tipo</th>
+        <th class="numeric">Monto / %</th><th>Motivo</th><th class="numeric">Bruto</th><th class="numeric">Retención</th><th class="numeric">Neto</th></tr></thead>
+      <tbody>
+        @for (bonus of page().data; track bonus.bonusId) {
+          <tr><td><div class="row-actions">
+            <button type="button" class="action" [disabled]="bonus.stateCode !== registered || acting() || loading()" (click)="confirmation.set({ bonus, action: 'cancel' })" [attr.aria-label]="'Anular bono de ' + bonus.fullName">Anular</button>
+            <button type="button" class="action danger" [disabled]="bonus.stateCode !== registered || acting() || loading()" (click)="confirmation.set({ bonus, action: 'delete' })" [attr.aria-label]="'Eliminar bono de ' + bonus.fullName">Eliminar</button>
+          </div></td><td><span class="badge" [class.cancelled]="bonus.stateCode === '0203'" [class.paid]="bonus.stateCode === '0202'">{{ bonus.stateDescription }}</span></td>
+          <td class="nowrap">{{ bonus.period }}</td><td class="nowrap">{{ bonus.departmentCode }}-{{ bonus.employeeNumber }}<small class="cell-detail">{{ bonus.departmentName }}</small></td>
+          <td class="employee-name">{{ bonus.fullName }}</td><td>{{ bonus.bonusTypeDescription }}</td>
+          <td class="numeric">{{ bonus.value | number:'1.2-4' }}{{ bonus.bonusTypeId === 2 ? ' %' : '' }}</td>
+          <td>{{ bonus.reasonDescription }}</td><td class="numeric">{{ bonus.grossAmount | number:'1.2-2' }}</td>
+          <td class="numeric">{{ bonus.taxAmount | number:'1.2-2' }}</td><td class="numeric net">{{ bonus.netAmount | number:'1.2-2' }}</td></tr>
+        } @empty {
+          @if (!loading() && !failed()) { <tr><td colspan="11" class="empty"><strong>No hay bonos para mostrar</strong><br />Cambia los filtros o registra un nuevo bono.</td></tr> }
         }
-      </select>
-    </label>
+      </tbody>
+    </table>
   </div>
-
-  <p class="placeholder">
-    Los combos ya consumen <code>GET /api/v1/Catalog</code>. Implementa aquí el listado paginado,
-    las acciones por fila y el modal de registro descritos en el enunciado.
-  </p>
+  <footer class="pagination">
+    <span>10 filas por página · {{ page().totalRecords }} registros en total</span>
+    <div><button type="button" class="btn btn-secondary" [disabled]="loading() || page().pageNumber <= 1" (click)="goTo(page().pageNumber - 1)">Anterior</button>
+      <span aria-live="polite">Página {{ page().pageNumber }} de {{ page().totalPages || 1 }}</span>
+      <button type="button" class="btn btn-secondary" [disabled]="loading() || page().pageNumber >= page().totalPages" (click)="goTo(page().pageNumber + 1)">Siguiente</button></div>
+  </footer>
 </section>
+
+@if (showForm()) {
+  <app-bonus-form [departments]="departments()" [types]="bonusTypes()" [reasons]="reasons()" (saved)="saved()" (closed)="showForm.set(false)" />
+}
+@if (confirmation(); as pending) {
+  <div class="confirm-backdrop">
+    <section class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" (keydown.escape)="!acting() && confirmation.set(null)">
+      <h2 id="confirm-title">{{ pending.action === 'cancel' ? 'Anular' : 'Eliminar' }} bono</h2>
+      <p>{{ pending.bonus.fullName }} · {{ pending.bonus.period }}</p>
+      <p>{{ pending.action === 'cancel' ? 'El bono quedará en estado Anulado.' : 'El bono dejará de aparecer en el listado; se conservará su historial.' }}</p>
+      <div class="confirm-actions"><button type="button" class="btn btn-secondary" [disabled]="acting()" (click)="confirmation.set(null)">Volver</button>
+        <button type="button" class="btn btn-danger" [disabled]="acting()" (click)="confirm()">{{ acting() ? 'Procesando…' : 'Confirmar' }}</button></div>
+    </section>
+  </div>
+}

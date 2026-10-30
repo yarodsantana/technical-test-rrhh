@@ -1,0 +1,30 @@
+dialog { border:0; border-radius:14px; width:min(720px,calc(100vw - 32px)); max-height:90vh; padding:0; color:var(--text); box-shadow:0 20px 80px #0b233a40; }
+dialog::backdrop { background:#14283c80; }
+.modal-header { display:flex; justify-content:space-between; align-items:center; padding:24px 28px 20px; border-bottom:1px solid var(--border); }
+h2 { margin:5px 0 0; font-size:1.4rem; }
+h3 { font-size:.9rem; margin:0 0 16px; }
+.eyebrow { color:var(--primary); font-size:.7rem; font-weight:700; letter-spacing:.1em; margin:0; }
+.close-button { background:transparent; border:0; font-size:1.7rem; cursor:pointer; color:var(--text-muted); }
+.modal-body { padding:24px 28px; }
+.lookup-fields { display:flex; gap:12px; align-items:flex-end; }
+.lookup-fields>label { flex:1; min-width:0; }
+label { display:flex; flex-direction:column; gap:7px; font-size:.8rem; font-weight:600; }
+input,select { width:100%; min-width:0; background:white; }
+small { font-size:.72rem; font-weight:400; color:var(--text-muted); line-height:1.5; }
+.error { color:#ab3131; }
+.employee-card { background:#f0f7f6; padding:18px; border:1px solid #d1e5e1; border-radius:8px; margin:20px 0 26px; }
+.employee-card>strong,.employee-card>span { display:block; }
+.employee-card>span { color:var(--text-muted); font-size:.8rem; margin:4px 0 16px; }
+dl { display:flex; gap:24px; justify-content:space-between; margin:0; }
+dt { font-size:.7rem; color:var(--text-muted); }
+dd { margin:5px 0 0; font-size:.9rem; font-weight:600; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px 16px; }
+.preview { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid var(--border); border-radius:8px; margin-top:24px; overflow:hidden; }
+.preview>div { display:flex; flex-direction:column; gap:8px; padding:16px; }
+.preview span { font-size:.75rem; color:var(--text-muted); }
+.preview strong { font-size:1.2rem; font-variant-numeric:tabular-nums; }
+.net-preview { background:#edf5ff; color:var(--primary); }
+.hint { font-size:.75rem; color:var(--text-muted); }
+.search-hint { padding:20px 0; }
+.modal-footer { display:flex; justify-content:flex-end; gap:12px; padding:18px 28px; border-top:1px solid var(--border); background:#fafbfd; }
+@media(max-width:600px) { .lookup-fields { flex-wrap:wrap; } .lookup-fields>label { flex:1 1 40%; } .form-grid { grid-template-columns:1fr; } .modal-body { padding:20px; } dl { gap:10px; flex-wrap:wrap; } .preview>div { padding:12px; } .preview strong { font-size:1rem; } }
